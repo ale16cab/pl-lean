@@ -54,13 +54,13 @@ This lecture mainly uses `→`, which denotes a function type.
 /-
   __Exercise__: Type a formula involving a few symbols in a comment.
   Don't worry if it is not valid Lean syntax for now.
+
+def somma (α β: Int) : Int := α + β
+def andfunction (α β: Bool) : Bool := α ∧ β
 -/
 
 end Reading_this_file
-
-
 section Queries
-
 /-
 
 ## Expressions, values, and types
@@ -68,8 +68,8 @@ section Queries
 In an imperative language, we often think in terms of commands that update a
 store: assign a variable, execute a loop, print a result, and so on.
 
-Functional programming starts from a different viewpoint.  An expression has
-a value, and evaluating the expression computes that value.  A pure function
+Functional programming starts from a different viewpoint. An expression has
+a value, and evaluating the expression computes that value. A pure function
 maps inputs to outputs without modifying hidden state.
 
 Every valid Lean expression also has a type.  A type tells us what kind of
@@ -92,7 +92,7 @@ program being defined.
 
 #eval true
 #eval false
-
+#eval (true || false) && false
 /-
 
 Lean reports that `true` and `false` both have type `Bool`.
@@ -104,6 +104,7 @@ Importantly, we can also ask Lean to print how the type Bool is defined.
 -/
 
 #print Bool
+#print List --- Stampa la definizione di un nome, in questo caso dei tipi Bool e List
 
 /-
 We see that Bool is an *inductive type*. We will return to this key feature later,
@@ -194,9 +195,14 @@ def andB (a b : Bool) : Bool :=
 __Exercise__: Define a function `orB` that implements the disjunction connective
 -/
 
-def orB (a b : Bool) : Bool :=
-  sorry
+def orB (a b : Bool) : Bool := a || b
 
+#check orB
+#eval orB true true
+#eval orB true false
+#eval orB false true
+#eval orB false false
+#print orB
 
 /-
 
@@ -211,7 +217,6 @@ As a first example, we consider a basic equality that is true "by definition".
 
 theorem false_and_any_is_false (a: Bool): andB false a = false := by
   rfl
-
 /-
 
 We have introduced a new theorem, named `false_and_any_is_false`, stating that
@@ -233,10 +238,20 @@ mark them with `sorry`.
 Here is an example:
 -/
 
-theorem andB_commutative_sorry (a b : Bool) : andB a b = andB b a := by sorry
+--- theorem andB_commutative_sorry (a b : Bool) : andB a b = andB b a := by sorry
 
 /-
 __Exercise__: Try to replace `sorry` with `rfl`, and see what happens in the Infoview.
+-/
+--- theorem andB_commutative_sorry (a b : Bool) : andB a b = andB b a := by rfl
+/-
+Output: Tactic `rfl` failed: The left-hand side
+  andB a b
+is not definitionally equal to the right-hand side
+  andB b a
+
+a b : Bool
+⊢ andB a b = andB b a
 -/
 
 /-
@@ -272,13 +287,17 @@ are especially convenient in functional programming.
 def mystery : Bool → Bool :=
   andB true
 
+#check mystery
+#eval mystery true
+
 /-
   __Exercise__: find a simpler way to define a function equivalent to the `mystery` above.
   The function must satisfy the equality specified by the theorem `mystery_resolved`.
   For the moment, leave the `sorry` in `mystery_resolved`.
 -/
 
-def mystery₂ : Bool → Bool := sorry
+def mystery₂ : Bool → Bool := by sorry
+
 
 theorem mystery_resolved (b: Bool): mystery b = mystery₂ b := by sorry
 
@@ -305,7 +324,7 @@ def negLambda : Bool → Bool :=
 #eval negLambda true
 
 /-
-The ascii keywork `fun` can be equivalently written as the greek letter `\lambda`:
+The ascii keyword `fun` can be equivalently written as the greek letter `\lambda`:
 -/
 
 def negLambda₂ : Bool → Bool :=
@@ -673,7 +692,7 @@ The symbol `∀` means “for all”. Thus, the statement below reads:
 
 To prove theorems of this form, we usually start by saying "Suppose a is some Boolean ..."
 Formally, this is rendered in the proof by `intros a`, which moves `a` from the quantifier
-to the goal (place your cursor after the `intro a` and see what happend in the Infoview).
+to the goal (place your cursor after the `intro a` and see what happened in the Infoview).
 
 Note that the name `a` we chose with `intro a` is irrelevant: we could as well have used
 another name instead of `a`, preserving the validity of the proof.
@@ -690,7 +709,7 @@ An important but subtle point is that Lean distinguishes Boolean values from pro
 
 In particular, in our theorem `false_and_any_is_false`:
 * `andB false a` computes a `Bool`;
-* `anddB false a = false` is a proposition asserting an equality.
+* `andB false a = false` is a proposition asserting an equality.
 
 The commands `example` and `theorem` state a proposition and ask you to provide a proof.
 
